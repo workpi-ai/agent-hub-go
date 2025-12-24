@@ -19,13 +19,14 @@ type Hub struct {
 
 type Agent struct {
 	Name         string   `yaml:"name" validate:"required"`
+	Type         string   `yaml:"type"`
 	Description  string   `yaml:"description" validate:"required"`
 	Tools        []string `yaml:"tools"`
-	SystemPrompt string   `validate:"required"`
+	SystemPrompt string   `yaml:"-" validate:"required"`
 }
 
 type Command struct {
 	Name        string `yaml:"name" validate:"required"`
 	Description string `yaml:"description" validate:"required"`
-	Prompt      string `validate:"required"`
+	Prompt      string `yaml:"-" validate:"required"`
 }

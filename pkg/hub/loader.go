@@ -91,7 +91,11 @@ func (l *Loader) loadAgentsFromFS(fsys fs.FS, subPath string) (map[string]*Agent
 		}
 
 		if agent.Name == "" {
-			agent.Name = strings.TrimSuffix(filepath.Base(path), markdownExt)
+			relPath := path
+			if subPath != currentDir {
+				relPath = strings.TrimPrefix(path, subPath+"/")
+			}
+			agent.Name = strings.TrimSuffix(filepath.Base(relPath), markdownExt)
 		}
 
 		if err := validate.Struct(agent); err != nil {

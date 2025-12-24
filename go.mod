@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/go-playground/validator/v10 v10.29.0
-	github.com/workpi-ai/agent-hub v0.0.6
+	github.com/workpi-ai/agent-hub v0.0.7
 	github.com/workpi-ai/go-utils v0.0.2
 	golang.org/x/exp v0.0.0-20251209150349-8475f28825e9
 	gopkg.in/yaml.v3 v3.0.1

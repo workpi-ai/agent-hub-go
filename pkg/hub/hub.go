@@ -6,6 +6,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/workpi-ai/go-utils/ghrelease"
 	"golang.org/x/exp/maps"
 )
 
@@ -20,16 +21,20 @@ type Options struct {
 }
 
 func New(opts Options) (*Hub, error) {
-	if opts.LocalStandardAgentsDir == "" || opts.LocalStandardCommandsDir == "" {
-		return nil, fmt.Errorf("LocalStandardAgentsDir and LocalStandardCommandsDir are required")
-	}
+	// Empty paths are allowed - will use embedded registry
 	if opts.CheckInterval == 0 {
 		opts.CheckInterval = DefaultCheckInterval
 	}
 
-	updater, err := NewUpdater(opts.MetadataFile, opts.LocalStandardAgentsDir, opts.LocalStandardCommandsDir)
-	if err != nil {
-		return nil, err
+	var updater *ghrelease.Updater
+	var err error
+	
+	// Only create updater if local paths are provided
+	if opts.LocalStandardAgentsDir != "" && opts.LocalStandardCommandsDir != "" {
+		updater, err = NewUpdater(opts.MetadataFile, opts.LocalStandardAgentsDir, opts.LocalStandardCommandsDir)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	hub := &Hub{
@@ -73,6 +78,23 @@ func (h *Hub) Agents() []*Agent {
 	return agents
 }
 
+func (h *Hub) AgentsByType(agentType string) []*Agent {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	var filtered []*Agent
+	for _, agent := range h.agents {
+		if agent.Type == agentType {
+			filtered = append(filtered, agent)
+		}
+	}
+
+	sort.Slice(filtered, func(i, j int) bool {
+		return filtered[i].Name < filtered[j].Name
+	})
+	return filtered
+}
+
 func (h *Hub) Command(name string) (*Command, error) {
 	h.mu.RLock()
 	cmd, ok := h.commands[name]
@@ -96,6 +118,9 @@ func (h *Hub) Commands() []*Command {
 }
 
 func (h *Hub) ForceUpdate() error {
+	if h.updater == nil {
+		return fmt.Errorf("updater not available: using embedded registry")
+	}
 	if err := h.updater.Update(); err != nil {
 		return err
 	}
@@ -134,6 +159,9 @@ func (h *Hub) autoUpdateLoop(interval time.Duration) {
 }
 
 func (h *Hub) updateAndReload() {
+	if h.updater == nil {
+		return
+	}
 	if err := h.updater.Update(); err != nil {
 		slog.Error("update failed", "error", err)
 	}

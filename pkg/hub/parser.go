@@ -9,11 +9,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var nameRegex = regexp.MustCompile(`^[a-zA-Z0-9]+$`)
+var nameRegex = regexp.MustCompile(`^[a-zA-Z0-9\s\.\-]+$`)
 
 func validateName(name string) error {
 	if name != "" && !nameRegex.MatchString(name) {
-		return fmt.Errorf("name must contain only letters and numbers: %s", name)
+		return fmt.Errorf("name contains invalid characters: %s", name)
 	}
 	return nil
 }

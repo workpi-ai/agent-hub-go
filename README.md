@@ -8,6 +8,8 @@ Go SDK for [agent-hub](https://github.com/workpi-ai/agent-hub) - A centralized r
 - 🔄 **Auto-update**: Automatically checks for updates on startup
 - 📦 **Lightweight**: Minimal overhead with embedded markdown files
 - 🤖 **Multi-agent**: Supports various specialized agents
+- 🏷️ **Type filtering**: Filter agents by type (general, openai, etc.)
+- 📂 **Nested structure**: Supports hierarchical agent organization
 
 ## Installation
 
@@ -34,17 +36,19 @@ func main() {
     configDir := filepath.Join(home, ".codev", "agents", "registry")
     
     h, err := hub.New(hub.Options{
-        ConfigDir:  configDir,
-        AutoUpdate: false,
+        LocalStandardAgentsDir:   filepath.Join(configDir, "agents"),
+        LocalStandardCommandsDir: filepath.Join(configDir, "commands"),
+        MetadataFile:             filepath.Join(configDir, "metadata.json"),
+        AutoUpdate:               false,
     })
     if err != nil {
         log.Fatal(err)
     }
     defer h.Close()
     
-    // Get agent
-    agent, _ := h.Agent("engineering")
-    fmt.Printf("Agent: %s\n", agent.Name)
+    // Get agent by full name (includes path prefix for nested agents)
+    agent, _ := h.Agent(hub.AgentEngineering)  // "Engineering"
+    fmt.Printf("Agent: %s (Type: %s)\n", agent.Name, agent.Type)
     fmt.Printf("Description: %s\n", agent.Description)
     fmt.Printf("Tools: %v\n", agent.Tools)
     
@@ -52,10 +56,47 @@ func main() {
     agents := h.Agents()
     fmt.Printf("Total agents: %d\n", len(agents))
     for _, a := range agents {
+        fmt.Printf("  - %s (%s): %s\n", a.Name, a.Type, a.Description)
+    }
+    
+    // Filter agents by type
+    generalAgents := h.AgentsByType(hub.AgentTypeGeneral)
+    fmt.Printf("\nGeneral agents: %d\n", len(generalAgents))
+    for _, a := range generalAgents {
         fmt.Printf("  - %s: %s\n", a.Name, a.Description)
     }
 }
 ```
+
+## Agent Naming Convention
+
+Agents use the `name` field from their frontmatter metadata, regardless of file location:
+
+- `Engineering` - Agent in `agents/general/engineering.md` with `name: Engineering`
+- `GPT-5 Codex` - Agent in `agents/openai/gpt-5-codex.md` with `name: GPT-5 Codex`
+- Agent names must be unique across all directories
+
+Use predefined constants from `hub` package:
+- `hub.AgentEngineering` - "Engineering"
+- `hub.AgentGPT5Codex` - "GPT-5 Codex"
+- etc.
+
+## API Reference
+
+### Hub Methods
+
+- `Agent(name string) (*Agent, error)` - Get agent by full name
+- `Agents() []*Agent` - List all agents sorted by name
+- `AgentsByType(agentType string) []*Agent` - Filter agents by type
+- `Command(name string) (*Command, error)` - Get command by name
+- `Commands() []*Command` - List all commands sorted by name
+- `ForceUpdate() error` - Manually trigger update from GitHub
+- `Close() error` - Stop auto-update loop and cleanup
+
+### Agent Types
+
+- `hub.AgentTypeGeneral` - "general"
+- `hub.AgentTypeOpenAI` - "openai"
 
 ## Data Priority
 
