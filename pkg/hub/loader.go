@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -83,11 +84,13 @@ func (l *Loader) loadUserAgents() (map[string]*Agent, error) {
 
 func (l *Loader) loadAgentsFromFS(fsys fs.FS, subPath string) (map[string]*Agent, error) {
 	agents := make(map[string]*Agent)
+	var errs []error
 
 	err := l.walkMarkdownFiles(fsys, subPath, func(path string, data []byte) error {
 		agent, err := parseAgent(data)
 		if err != nil {
-			return fmt.Errorf("parse %s: %w", path, err)
+			errs = append(errs, fmt.Errorf("parse %s: %w", path, err))
+			return nil
 		}
 
 		if agent.Name == "" {
@@ -99,11 +102,12 @@ func (l *Loader) loadAgentsFromFS(fsys fs.FS, subPath string) (map[string]*Agent
 		}
 
 		if err := validate.Struct(agent); err != nil {
-			return fmt.Errorf("validate %s: %w", path, err)
+			errs = append(errs, fmt.Errorf("validate %s: %w", path, err))
+			return nil
 		}
 
 		if _, exists := agents[agent.Name]; exists {
-			return fmt.Errorf("duplicate agent name: %s", agent.Name)
+			errs = append(errs, fmt.Errorf("duplicate agent name: %s (path: %s)", agent.Name, path))
 		}
 		agents[agent.Name] = agent
 		return nil
@@ -112,6 +116,11 @@ func (l *Loader) loadAgentsFromFS(fsys fs.FS, subPath string) (map[string]*Agent
 	if err != nil {
 		return nil, err
 	}
+
+	if len(errs) > 0 {
+		slog.Warn("agent load error", "error", errors.Join(errs...))
+	}
+
 	return agents, nil
 }
 
@@ -157,11 +166,13 @@ func (l *Loader) loadUserCommands() (map[string]*Command, error) {
 
 func (l *Loader) loadCommandsFromFS(fsys fs.FS, subPath string) (map[string]*Command, error) {
 	commands := make(map[string]*Command)
+	var errs []error
 
 	err := l.walkMarkdownFiles(fsys, subPath, func(path string, data []byte) error {
 		cmd, err := parseCommand(data)
 		if err != nil {
-			return fmt.Errorf("parse %s: %w", path, err)
+			errs = append(errs, fmt.Errorf("parse %s: %w", path, err))
+			return nil
 		}
 
 		relPath := path
@@ -179,11 +190,12 @@ func (l *Loader) loadCommandsFromFS(fsys fs.FS, subPath string) (map[string]*Com
 		}
 
 		if err := validate.Struct(cmd); err != nil {
-			return fmt.Errorf("validate %s: %w", path, err)
+			errs = append(errs, fmt.Errorf("validate %s: %w", path, err))
+			return nil
 		}
 
 		if _, exists := commands[cmd.Name]; exists {
-			return fmt.Errorf("duplicate command name: %s", cmd.Name)
+			errs = append(errs, fmt.Errorf("duplicate command name: %s (path: %s)", cmd.Name, path))
 		}
 		commands[cmd.Name] = cmd
 		return nil
@@ -192,6 +204,11 @@ func (l *Loader) loadCommandsFromFS(fsys fs.FS, subPath string) (map[string]*Com
 	if err != nil {
 		return nil, err
 	}
+
+	if len(errs) > 0 {
+		slog.Warn("command load error", "error", errors.Join(errs...))
+	}
+
 	return commands, nil
 }
 
