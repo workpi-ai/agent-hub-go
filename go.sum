@@ -23,8 +23,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
-github.com/workpi-ai/agent-hub v0.0.7 h1:xBmQfYaCcDmp/NnjOzZYe7vm7BavkT+fST31yI8TgjY=
-github.com/workpi-ai/agent-hub v0.0.7/go.mod h1:2W56i1GuDH8+/BTtGb7iqinKqOTziKS3HvI73zjBIfk=
+github.com/workpi-ai/agent-hub v0.0.8 h1:8BJdFAA4ny08pdUNt0iO+JWHFuTcO658aR+VgJ9ndGc=
+github.com/workpi-ai/agent-hub v0.0.8/go.mod h1:2W56i1GuDH8+/BTtGb7iqinKqOTziKS3HvI73zjBIfk=
 github.com/workpi-ai/go-utils v0.0.3 h1:IF65DHCa/zGhpCEcpMPsBPMmxGjOWrN7QmBTYys1lHw=
 github.com/workpi-ai/go-utils v0.0.3/go.mod h1:mCZio+vwblIziRQiV8KBtBaN9zsTZLJso1yLUfBFxJY=
 golang.org/x/crypto v0.45.0 h1:jMBrvKuj23MTlT0bQEOBcAE0mjg8mK9RXFhRH6nyF3Q=

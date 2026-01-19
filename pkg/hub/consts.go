@@ -17,14 +17,15 @@ const (
 	AgentTypeOpenAI  = "openai"
 
 	// General agents
-	AgentEngineering = "Engineering"
-	AgentDesign      = "Design"
+	AgentEngineering      = "Engineering"
+	AgentDesign           = "Design"
+	AgentDesktopAssistant = "DesktopAssistant"
 
 	// OpenAI agents
-	AgentGPT             = "GPT"
-	AgentGPT5Codex       = "GPT-5 Codex"
-	AgentGPT51CodexMax   = "GPT-5.1 Codex Max"
-	AgentGPT52Codex      = "GPT-5.2 Codex"
-	AgentGPT51           = "GPT-5.1"
-	AgentGPT52           = "GPT-5.2"
+	AgentGPT           = "GPT"
+	AgentGPT5Codex     = "GPT-5 Codex"
+	AgentGPT51CodexMax = "GPT-5.1 Codex Max"
+	AgentGPT52Codex    = "GPT-5.2 Codex"
+	AgentGPT51         = "GPT-5.1"
+	AgentGPT52         = "GPT-5.2"
 )
